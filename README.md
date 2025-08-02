@@ -90,7 +90,7 @@ This project follows a **simplified, production-ready architecture**:
 ### 2. Data Preprocessing
 - Comprehensive preprocessing pipeline in `src/utils/data_preprocessing.py`
 - Missing value handling with automatic strategy selection
-- Outlier detection and treatment (IQR and Z-score methods)
+- Outlier detection (reporting only, no automatic modification)
 - Data normalization/standardization
 - Categorical feature encoding (binary, one-hot, label encoding)
 - Feature scaling and transformation
@@ -147,7 +147,7 @@ This project follows a **simplified, production-ready architecture**:
 
 2. **Data Preprocessing**:
    ```python
-   from src.utils import preprocess_ai4i_data
+   from src.utils.data_preprocessing import preprocess_ai4i_data
    
    # Run comprehensive preprocessing pipeline
    summary = preprocess_ai4i_data(
@@ -156,13 +156,32 @@ This project follows a **simplified, production-ready architecture**:
    )
    ```
 
-3. **Data Exploration**:
-   - Start with `notebooks/01_data_exploration.ipynb`
-   - Review initial data characteristics and patterns
+3. **Feature Engineering**:
+   ```python
+   from src.features.feature_engineering import FeatureEngineer
+   from src.features.feature_selection import FeatureSelector
+   
+   # Create and select features for model training
+   engineer = FeatureEngineer()
+   selector = FeatureSelector()
+   
+   features = engineer.get_feature_set(data, 'extended')
+   selected_features = selector.select_best_features(features, target)
+   ```
 
-4. **Model Development**:
-   - Follow the numbered notebook sequence
-   - Each notebook builds upon the previous analysis
+4. **Model Training** (Production Pipeline):
+   ```bash
+   # Run complete training pipeline
+   python scripts/train_model.py
+   
+   # Evaluate trained models
+   python scripts/evaluate_model.py
+   ```
+
+5. **Optional: Interactive Exploration**:
+   - Use `notebooks/01_data_exploration.ipynb` for initial data analysis
+   - Use `notebooks/02_experimentation.ipynb` for model prototyping
+   - **Note**: Notebooks are for experimentation only; production workflow uses scripts
 
 ## Expected Deliverables
 
