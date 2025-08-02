@@ -34,11 +34,6 @@ AI4I/
 │   └── 02_experimentation.ipynb     # Model prototyping and testing (optional)
 ├── src/
 │   ├── __init__.py
-│   ├── data/
-│   │   ├── __init__.py
-│   │   ├── data_loader.py            # Data loading utilities
-│   │   ├── data_cleaner.py           # Data cleaning and preprocessing
-│   │   └── data_validator.py         # Data quality checks
 │   ├── features/
 │   │   ├── __init__.py
 │   │   ├── feature_engineering.py    # Feature creation and transformation
@@ -62,18 +57,27 @@ AI4I/
 │       ├── __init__.py
 │       ├── config.py                 # Configuration management
 │       ├── logger.py                 # Logging utilities
+│       ├── data_preprocessing.py     # Comprehensive data preprocessing pipeline
 │       └── helpers.py                # General helper functions
 ├── scripts/
 │   ├── train_model.py                # Main training script
 │   ├── evaluate_model.py             # Model evaluation script
 │   ├── predict.py                    # Prediction script
-│   ├── preprocess_data.py            # Data preprocessing pipeline
 │   └── generate_report.py            # Report generation script
 ├── models/                           # Saved model artifacts
 ├── reports/                          # Analysis reports and presentations
 ├── tests/                           # Unit tests
 └── requirements.txt                  # Python dependencies
 ```
+
+## Architecture Philosophy
+
+This project follows a **simplified, production-ready architecture**:
+
+- **Consolidated Data Processing**: Instead of multiple small data modules, we use a single comprehensive `data_preprocessing.py` script that handles all data operations efficiently
+- **Modular Design**: Each component (features, models, visualization, utils) has clear responsibilities
+- **Script-First Approach**: Core functionality is implemented in Python scripts for production use, with notebooks reserved for experimentation and prototyping
+- **Clean Dependencies**: Minimal module interdependencies for better maintainability
 
 ## Methodology
 
@@ -84,10 +88,14 @@ AI4I/
 - Correlation analysis between variables
 
 ### 2. Data Preprocessing
-- Missing value handling
-- Outlier detection and treatment
+- Comprehensive preprocessing pipeline in `src/utils/data_preprocessing.py`
+- Missing value handling with automatic strategy selection
+- Outlier detection and treatment (IQR and Z-score methods)
 - Data normalization/standardization
+- Categorical feature encoding (binary, one-hot, label encoding)
 - Feature scaling and transformation
+- Automated data quality assessment and validation
+- Train/validation/test split with stratification
 
 ### 3. Feature Engineering
 - Domain-specific feature creation
@@ -137,11 +145,22 @@ AI4I/
    pip install -r requirements.txt
    ```
 
-2. **Data Exploration**:
+2. **Data Preprocessing**:
+   ```python
+   from src.utils import preprocess_ai4i_data
+   
+   # Run comprehensive preprocessing pipeline
+   summary = preprocess_ai4i_data(
+       data_path="data/raw/ai4i2020.csv",
+       output_dir="data/processed"
+   )
+   ```
+
+3. **Data Exploration**:
    - Start with `notebooks/01_data_exploration.ipynb`
    - Review initial data characteristics and patterns
 
-3. **Model Development**:
+4. **Model Development**:
    - Follow the numbered notebook sequence
    - Each notebook builds upon the previous analysis
 
