@@ -1,336 +1,335 @@
-# AI4I Predictive Maintenance 🔧
+# AI4I 2020 Predictive Maintenance
 
-> Vorhersage von Maschinenausfällen mit künstlicher Intelligenz
+> Machine learning pipeline for equipment failure prediction using the AI4I 2020 dataset
 
-## Was macht dieses Projekt?
+## Overview
 
-Dieses Tool analysiert Sensordaten von Industriemaschinen und sagt vorher, wann sie wahrscheinlich ausfallen werden. So können Sie:
+This project implements a production-ready, experiment-driven machine learning pipeline for predictive maintenance. The architecture prioritizes technical excellence, reproducible experiments, and systematic model comparison over business consulting.
 
-- **Ausfälle vermeiden** bevor sie passieren
-- **Wartungskosten senken** durch bessere Planung  
-- **Produktion optimieren** mit weniger ungeplanten Stopps
-- **Geld sparen** durch präventive statt reaktive Wartung
+**Key Features:**
+- **Experiment-driven workflow** with versioned configurations
+- **Multiple feature engineering strategies** (minimal, extended, advanced)
+- **Comprehensive model comparison** across different algorithms and feature sets
+- **Production-ready Python scripts** with CLI interfaces
+- **Systematic evaluation framework** with cross-experiment analysis
 
-## Quick Start 🚀
+## Quick Start
 
-### 1. Installation
+### 1. Environment Setup
 
 ```bash
-# Repository herunterladen
+# Clone repository
 git clone https://github.com/prennerm/AI4I-Predictive-Maintenance.git
 cd AI4I-Predictive-Maintenance
 
-# Python-Pakete installieren
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Erstes Modell trainieren
+### 2. Run Baseline Experiment
 
 ```bash
-# Vollständiges Training mit Standardeinstellungen
-python scripts/train_model.py
+# Train models with minimal feature engineering
+python scripts/train_model.py --experiment-id baseline_v1 --feature-strategy minimal
 
-# Schneller Test (nur für Ausprobieren)
-python scripts/train_model.py --quick-run
+# Evaluate results
+python scripts/evaluate_model.py --experiment-id baseline_v1
 ```
 
-### 3. Vorhersagen machen
+### 3. Feature Engineering Experiments
 
 ```bash
-# Einzelne Vorhersage (Beispielwerte)
-python scripts/predict.py --model models/best_model/ --input "300,310,1500,40,120"
+# Test different feature strategies
+python scripts/train_model.py --experiment-id extended_v1 --feature-strategy extended
+python scripts/train_model.py --experiment-id advanced_v1 --feature-strategy advanced
 
-# CSV-Datei mit mehreren Maschinen
-python scripts/predict.py --model models/best_model/ --input your_data.csv --batch
+# Compare feature strategies
+python scripts/evaluate_model.py --compare baseline_v1 extended_v1 advanced_v1
 ```
 
-### 4. Report erstellen
+### 4. Model Comparison Experiments
 
 ```bash
-# Business-Report für Management
-python scripts/generate_report.py --type executive --models models/
+# Same features, different models
+python scripts/train_model.py --experiment-id baseline_rf --feature-strategy minimal --models random-forest
+python scripts/train_model.py --experiment-id baseline_xgb --feature-strategy minimal --models xgboost
 
-# Technischer Report
-python scripts/generate_report.py --type technical --models models/
+# Compare model performance
+python scripts/evaluate_model.py --compare baseline_rf baseline_xgb
 ```
 
-## Wie verwende ich eigene Daten? 📊
-
-### Datenformat
-
-Ihre CSV-Datei sollte diese Spalten enthalten:
-
-```csv
-Air temperature [K],Process temperature [K],Rotational speed [rpm],Torque [Nm],Tool wear [min],Machine failure
-300.1,309.2,1551,42.8,0,0
-298.2,308.6,1408,46.3,3,0
-...
-```
-
-- **Machine failure**: 0 = Normal, 1 = Ausfall (nur für Training nötig)
-- **Andere Spalten**: Sensormesswerte Ihrer Maschinen
-
-### Eigene Daten verwenden
+### 5. Generate Technical Reports
 
 ```bash
-# 1. Ihre Daten ins data/raw/ Verzeichnis kopieren
-cp ihre_daten.csv data/raw/
+# Generate experiment comparison plots
+python scripts/generate_report.py --experiments baseline_v1 extended_v1 advanced_v1 --output reports/feature_comparison/
 
-# 2. Modell mit Ihren Daten trainieren
-python scripts/train_model.py --data data/raw/ihre_daten.csv
-
-# 3. Vorhersagen für neue Daten
-python scripts/predict.py --model models/best_model/ --input neue_daten.csv
+# Generate comprehensive evaluation report
+python scripts/generate_report.py --experiments baseline_v1 --technical-report
 ```
 
-## Verstehe die Ergebnisse 🎯
+## Dataset Information
 
-### Vorhersage-Output
+**AI4I 2020 Predictive Maintenance Dataset**
+- **Samples**: 10,000 data points
+- **Target**: Machine failure (binary classification)
+- **Features**: 6 core predictors after data leakage prevention
+  - Type (categorical)
+  - Air temperature [K]
+  - Process temperature [K] 
+  - Rotational speed [rpm]
+  - Torque [Nm]
+  - Tool wear [min]
+- **Key Insight**: UDI and Product ID excluded to prevent data leakage
 
-```json
-{
-  "prediction": 1,              // 0 = OK, 1 = Ausfall erwartet
-  "probability": 0.85,          // 85% Ausfallwahrscheinlichkeit  
-  "risk_level": "HIGH",         // LOW/MEDIUM/HIGH/CRITICAL
-  "recommended_action": "Schedule maintenance within 48 hours",
-  "confidence": 0.92            // Wie sicher ist das Modell
-}
-```
+## Experiment Framework
 
-### Risk Levels erklärt
+### Feature Engineering Strategies
 
-- 🟢 **LOW (0-30%)**: Weiterlaufen lassen
-- 🟡 **MEDIUM (30-60%)**: Wartung innerhalb 1 Woche planen
-- 🟠 **HIGH (60-80%)**: Wartung innerhalb 48h einplanen
-- 🔴 **CRITICAL (80%+)**: SOFORT warten - Maschine stoppen!
+1. **Minimal Strategy** (`--feature-strategy minimal`)
+   - Uses only the 6 core features with basic preprocessing
+   - Label encoding for categorical variables
+   - Standard scaling for numerical features
 
-## Häufige Anwendungsfälle 💼
+2. **Extended Strategy** (`--feature-strategy extended`)
+   - Includes domain-specific feature engineering
+   - Temperature ratios and differences
+   - Power calculations and efficiency metrics
 
-### Tägliche Überwachung
+3. **Advanced Strategy** (`--feature-strategy advanced`)
+   - Complex feature interactions
+   - Statistical derivations
+   - Advanced temporal features
 
+### Model Algorithms
+
+Available models:
+- `random-forest`: Random Forest Classifier
+- `xgboost`: XGBoost Classifier  
+- `logistic-regression`: Logistic Regression
+- `svm`: Support Vector Machine
+- `decision-tree`: Decision Tree Classifier
+
+## Script Reference
+
+### train_model.py
 ```bash
-# Alle Maschinen täglich prüfen
-python scripts/predict.py --model models/best_model/ --input daily_readings.csv --business-report
+# Basic usage
+python scripts/train_model.py --experiment-id my_experiment --feature-strategy minimal
+
+# Advanced options
+python scripts/train_model.py \
+    --experiment-id advanced_experiment \
+    --feature-strategy extended \
+    --models random-forest xgboost \
+    --cv-folds 10 \
+    --random-state 42
 ```
 
-### Wöchentliche Management-Reports
-
+### evaluate_model.py
 ```bash
-# Automatischer Wochenreport
-python scripts/generate_report.py --type executive --models models/ --format html
+# Evaluate single experiment
+python scripts/evaluate_model.py --experiment-id baseline_v1
+
+# Compare multiple experiments
+python scripts/evaluate_model.py --compare exp1 exp2 exp3
+
+# Generate detailed analysis
+python scripts/evaluate_model.py --experiment-id baseline_v1 --detailed-analysis
 ```
 
-### API für andere Systeme
-
+### predict.py
 ```bash
-# REST API starten (Port 8080)
-python scripts/predict.py --model models/best_model/ --api-mode --port 8080
+# Single prediction
+python scripts/predict.py --experiment-id baseline_v1 --input "M,298.1,308.6,1551,42.8,0"
 
-# Dann HTTP POST an: http://localhost:8080/predict
-# mit JSON: {"input": [300, 310, 1500, 40, 120]}
+# Batch prediction from CSV
+python scripts/predict.py --experiment-id baseline_v1 --input-file data/new_samples.csv --output predictions.csv
 ```
 
-## Testen & Debugging 🔍
-
-### Funktioniert alles?
-
+### generate_report.py
 ```bash
-# Schneller Funktionstest
-python scripts/train_model.py --quick-run --no-hyperopt
+# Technical report for single experiment
+python scripts/generate_report.py --experiment-id baseline_v1 --output reports/baseline_report/
 
-# Sollte ohne Fehler durchlaufen und Modelle erstellen
+# Comparison report across experiments
+python scripts/generate_report.py --compare baseline_v1 extended_v1 --output reports/comparison/
 ```
 
-### Häufige Probleme & Lösungen
+## Understanding Results
 
-#### Problem: "ModuleNotFoundError"
+### Experiment Output Structure
+```
+models/experiments/
+├── baseline_v1/
+│   ├── config.json           # Experiment configuration
+│   ├── model_random_forest.pkl
+│   ├── model_xgboost.pkl
+│   ├── scaler.pkl
+│   └── feature_list.json
+└── extended_v1/
+    ├── config.json
+    ├── models/
+    └── evaluation/
+```
+
+### Evaluation Metrics
+- **Accuracy**: Overall classification accuracy
+- **Precision**: True positives / (True positives + False positives)
+- **Recall**: True positives / (True positives + False negatives)
+- **F1-Score**: Harmonic mean of precision and recall
+- **AUC-ROC**: Area under the receiver operating characteristic curve
+- **Cross-Validation**: K-fold validation with confidence intervals
+
+### Performance Comparison
 ```bash
-# Lösung: Pakete installieren
-pip install -r requirements.txt
+# View experiment comparison table
+python scripts/evaluate_model.py --compare baseline_v1 extended_v1 --format table
 
-# Oder spezifisches Paket
-pip install pandas scikit-learn xgboost
+# Generate performance plots
+python scripts/generate_report.py --compare baseline_v1 extended_v1 --plot-performance
 ```
 
-#### Problem: "FileNotFoundError"
-```bash
-# Daten existieren?
-ls data/raw/
-
-# Modell existiert?
-ls models/
-
-# Lösung: Erst trainieren, dann vorhersagen
-python scripts/train_model.py
-```
-
-#### Problem: Schlechte Vorhersagen
-```bash
-# Mehr Daten verwenden
-python scripts/train_model.py --data data/raw/mehr_daten.csv
-
-# Andere Modelle probieren
-python scripts/train_model.py --models random_forest xgboost svm
-
-# Performance prüfen
-python scripts/evaluate_model.py --model-dir models/ --compare-all
-```
-
-### Debug-Modus aktivieren
-
-```bash
-# Ausführliche Logs für Problemdiagnose
-python scripts/train_model.py --log-level DEBUG
-
-# Logs finden Sie in: logs/
-```
-
-### Performance prüfen
-
-```bash
-# Detaillierte Modell-Evaluation
-python scripts/evaluate_model.py --model-dir models/ --business-analysis
-
-# Ergebnisse in: reports/evaluation/
-```
-
-## Erweiterte Nutzung ⚙️
-
-### Konfigurationsdatei verwenden
-
-Erstellen Sie `config.yaml`:
-
-```yaml
-data:
-  test_size: 0.2
-  preprocessing:
-    scale_features: true
-
-training:
-  hyperparameter_optimization:
-    enabled: true
-    n_trials: 50
-
-models:
-  traditional:
-    random_forest:
-      n_estimators: [100, 200]
-```
-
-Dann verwenden:
-```bash
-python scripts/train_model.py --config config.yaml
-```
-
-### Batch-Verarbeitung
-
-```bash
-# Viele Dateien auf einmal
-for file in data/raw/*.csv; do
-    python scripts/predict.py --model models/best_model/ --input "$file" --output "predictions/$(basename $file .csv)_predictions.json"
-done
-```
-
-### Automatisierung (Cron)
-
-```bash
-# Täglich um 6 Uhr neue Vorhersagen
-0 6 * * * cd /pfad/zum/projekt && python scripts/predict.py --model models/best_model/ --input data/daily.csv --output reports/daily_predictions.json
-
-# Wöchentlich Modell neu trainieren  
-0 2 * * 1 cd /pfad/zum/projekt && python scripts/train_model.py --data data/raw/weekly_data.csv
-```
-
-## Tipps für bessere Ergebnisse 💡
-
-### Datenqualität verbessern
-
-1. **Mehr Daten sammeln** - Je mehr, desto besser
-2. **Ausgewogene Daten** - Sowohl normale als auch Ausfall-Beispiele
-3. **Aktuelle Daten** - Regelmäßig neue Daten hinzufügen
-4. **Vollständige Daten** - Wenige fehlende Werte
-
-### Modell optimieren
-
-```bash
-# Verschiedene Feature-Sets probieren
-python scripts/train_model.py --feature-set basic      # Weniger Features
-python scripts/train_model.py --feature-set extended   # Standard
-python scripts/train_model.py --feature-set comprehensive  # Alle Features
-
-# Hyperparameter-Optimierung
-python scripts/train_model.py --models xgboost --config hyperopt_config.yaml
-```
-
-### Business-Integration
-
-1. **Schrittweise einführen** - Erst parallel zu bestehenden Prozessen
-2. **Teams schulen** - Wartungsteams über neue Prozesse informieren
-3. **KPIs messen** - Erfolg quantifizieren (Ausfälle, Kosten, Uptime)
-4. **Feedback sammeln** - Kontinuierliche Verbesserung
-
-## Projektstruktur verstehen 📁
+## Project Structure
 
 ```
 AI4I/
-├── scripts/           # Die 4 Hauptprogramme
-│   ├── train_model.py       # Modelle trainieren
-│   ├── evaluate_model.py    # Performance bewerten  
-│   ├── predict.py           # Vorhersagen machen
-│   └── generate_report.py   # Reports erstellen
-├── src/               # Interner Code (nicht direkt verwenden)
-├── data/              # Ihre Daten
-│   ├── raw/                 # Original CSV-Dateien
-│   └── processed/           # Verarbeitete Daten
-├── models/            # Trainierte Modelle
-├── reports/           # Generierte Reports
-└── logs/              # Debug-Informationen
+├── scripts/           # Main executable scripts
+│   ├── train_model.py       # Experiment-driven model training
+│   ├── evaluate_model.py    # Model evaluation and comparison
+│   ├── predict.py           # Prediction pipeline
+│   └── generate_report.py   # Technical report generation
+├── src/               # Core library code
+│   ├── features/            # Feature engineering strategies
+│   ├── models/              # Model implementations
+│   ├── visualization/       # Plotting and analysis
+│   └── utils/               # Configuration and utilities
+├── data/              # Dataset storage
+│   ├── raw/                 # Original AI4I 2020 dataset
+│   ├── processed/           # Preprocessed data per experiment
+│   └── features/            # Feature engineering outputs
+├── models/            # Trained model artifacts
+├── reports/           # Generated technical reports
+├── tests/             # Unit tests
+└── requirements.txt   # Python dependencies
 ```
 
-**Faustregel**: Sie arbeiten hauptsächlich mit den 4 Scripts in `scripts/`!
+## Configuration
 
-## Support & Hilfe 🆘
+### Experiment Configuration
+Create `config/experiment.yaml`:
+```yaml
+experiment:
+  id: "my_experiment_v1"
+  description: "Testing extended features with hyperparameter tuning"
+  
+features:
+  strategy: "extended"
+  selection:
+    method: "mutual_info"
+    k_best: 10
 
-### Dokumentation
+models:
+  algorithms: ["random_forest", "xgboost"]
+  hyperparameter_tuning:
+    enabled: true
+    n_trials: 50
 
-- **Technische Details**: Siehe `architecture.md`
-- **API-Referenz**: Docstrings in den Python-Dateien
-- **Beispiele**: Siehe Kommentare in den Scripts
+evaluation:
+  cv_folds: 5
+  test_size: 0.2
+  stratify: true
+```
 
-### Fehlerbehebung
-
-1. **Logs prüfen**: `logs/` Verzeichnis
-2. **Debug-Modus**: `--log-level DEBUG` verwenden
-3. **Step-by-step**: Ein Script nach dem anderen testen
-4. **Clean start**: `models/` und `reports/` löschen, neu anfangen
-
-### Typische Workflows
-
-#### Erstmaliger Nutzer
+Use with:
 ```bash
-1. pip install -r requirements.txt
-2. python scripts/train_model.py --quick-run
-3. python scripts/predict.py --model models/best_model/ --input "300,310,1500,40,120"
-4. python scripts/generate_report.py --type executive --models models/
+python scripts/train_model.py --config config/experiment.yaml
 ```
 
-#### Produktive Nutzung
+## Testing & Debugging
+
+### Quick Validation
 ```bash
-1. python scripts/train_model.py --data data/raw/production_data.csv
-2. python scripts/evaluate_model.py --model-dir models/ --business-analysis
-3. python scripts/predict.py --model models/best_model/ --input daily_sensors.csv --business-report
-4. python scripts/generate_report.py --type operational --predictions predictions.json
+# Test basic functionality
+python scripts/train_model.py --experiment-id test_run --feature-strategy minimal --quick-test
+
+# Should complete without errors and create model artifacts
 ```
 
-## Was als nächstes? 🎯
+### Common Issues
 
-1. **Experimentieren**: Probieren Sie verschiedene Einstellungen aus
-2. **Integrieren**: Verbinden Sie mit Ihren bestehenden Systemen
-3. **Skalieren**: Erweitern Sie auf mehr Maschinen/Standorte
-4. **Optimieren**: Nutzen Sie die Reports zur kontinuierlichen Verbesserung
+#### Import Errors
+```bash
+# Install missing packages
+pip install -r requirements.txt
 
----
+# Check specific package
+python -c "import sklearn, pandas, xgboost; print('All packages available')"
+```
 
-🚀 **Viel Erfolg bei der Vorhersage von Maschinenausfällen!**
+#### File Path Issues
+```bash
+# Verify data exists
+ls data/raw/ai4i2020.csv
 
-*Bei Fragen oder Problemen: Schauen Sie in die Logs (`logs/`) oder aktivieren Sie den Debug-Modus mit `--log-level DEBUG`*
+# Check experiment output
+ls models/experiments/
+
+# Solution: Complete workflow
+python scripts/train_model.py --experiment-id baseline_test
+python scripts/evaluate_model.py --experiment-id baseline_test
+```
+
+#### Performance Issues
+```bash
+# Enable debug logging
+python scripts/train_model.py --experiment-id debug_test --log-level DEBUG
+
+# Check logs
+tail -f logs/train_model.log
+```
+
+### Testing Framework
+```bash
+# Run unit tests
+python -m pytest tests/
+
+# Test specific component
+python -m pytest tests/test_feature_engineering.py -v
+```
+
+## Advanced Usage
+
+### Custom Feature Engineering
+Create custom strategy in `src/features/feature_engineering.py`:
+```python
+def advanced_custom_features(df):
+    """Custom feature engineering strategy"""
+    # Your domain-specific features
+    df['power'] = df['Torque [Nm]'] * df['Rotational speed [rpm]']
+    df['temp_diff'] = df['Process temperature [K]'] - df['Air temperature [K]']
+    return df
+```
+
+### Hyperparameter Optimization
+```bash
+# Extensive hyperparameter search
+python scripts/train_model.py \
+    --experiment-id hyperopt_experiment \
+    --feature-strategy extended \
+    --models xgboost \
+    --hyperopt-trials 100 \
+    --hyperopt-timeout 3600
+```
+
+### Parallel Experiments
+```bash
+# Run multiple experiments in parallel
+python scripts/train_model.py --experiment-id exp1 --feature-strategy minimal &
+python scripts/train_model.py --experiment-id exp2 --feature-strategy extended &
+python scripts/train_model.py --experiment-id exp3 --feature-strategy advanced &
+wait
+
+# Compare all results
+python scripts/evaluate_model.py --compare exp1 exp2 exp3
+```
